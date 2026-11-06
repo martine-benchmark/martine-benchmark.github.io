@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Martine: Benchmarking Multi-View 3D Surface Reconstruction</title>
+  <link rel="icon" href="assets/images/martine_logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* THEME FIXES */
+    /* Bulma 1.0+ dark mode variables */
+    .theme-dark {
+      background-color: var(--bulma-scheme-main) !important;
+      color: var(--bulma-text) !important;
+    }
+    .theme-light {
+      background-color: var(--bulma-scheme-main-ter) !important;
+      color: var(--bulma-text-strong) !important;
+    }
+
+    /* HERO & MINIATURE IMAGE RESTORATION */
+    #hero {
+      position: relative;
+      background-color: #000;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+    }
+    .hero-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .hero-background img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.5; /* Restore the visible miniature background */
+    }
+    .hero-body {
+      position: relative;
+      z-index: 2; /* Ensures text is above the image */
+      width: 100%;
+    }
+
+    /* LAYOUT UTILITIES */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1.5rem;
+    }
+    .viewer-container {
+      width: 100%;
+      height: 450px;
+      background: #000;
+      border-radius: 8px;
+      position: relative;
+    }
+    .object-tabs2 {
+      display: flex;
+      list-style: none;
+      padding: 0;
+      border-bottom: 1px solid var(--bulma-border);
+      margin-bottom: 1rem;
+      overflow-x: auto;
+    }
+    .object-tabs li a {
+      padding: 0.5rem 1rem;
+      white-space: nowrap;
+      color: var(--bulma-link);
+      cursor: pointer;
+    }
+    .object-tabs li a.active {
+      border-bottom: 2px solid var(--bulma-link);
+      font-weight: bold;
+    }
+
+    /* Challenge legend (taxonomy explainer) */
+    .challenge-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem 1.25rem;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    .challenge-legend .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .challenge-legend .swatch {
+      width: 0.9rem;
+      height: 0.9rem;
+      border-radius: 3px;
+      display: inline-block;
+    }
+  </style>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Section 1: Hero -->
+  <section id="hero" class="hero theme-dark">
+    <div class="hero-background">
+      <img src="assets/images/MINIATURE_BLUR.jpg" alt="Martine Hero Background">
+    </div>
+    <div class="hero-body">
+      <div class="container has-text-centered">
+        <br>
+        <h1 class="title is-1" id="page-title">Martine</h1>
+        <h2 class="subtitle is-4 has-text-light" id="page-subtitle">
+          Benchmarking Multi-View 3D Surface Reconstruction<br>
+          Across Viewpoint Coverage, Resolution, and Lighting
+        </h2>
+
+        <div class="authors mb-4 has-text-white" id="authors">
+          <span class="author"><a href="https://robinbruneau.github.io/" target="_blank" style="color: white;"><strong>Robin Bruneau</strong></a><sup>1,&#42;</sup></span>,
+          <span class="author"><a href="https://bbrument.github.io/" target="_blank" style="color: white;"><strong>Baptiste Brument</strong></a><sup>2,&#42;</sup></span><br>
+          <span class="author"><a href="https://rocs.balgrist.ch/en/dr-frederic-giraud/" target="_blank" style="color: white;">Frederic Giraud</a><sup>3</sup></span>,
+          <span class="author"><a href="https://rocs.balgrist.ch/en/bastian-sigrist/" target="_blank" style="color: white;">Bastian Sigrist</a><sup>3</sup></span>,
+          <span class="author"><a href="https://scholar.google.com/citations?user=2ig3ZygAAAAJ" target="_blank" style="color: white;">Sascha Jecklin</a><sup>4</sup></span>,
+          <span class="author"><a href="https://rocs.balgrist.ch/en/prof-dr-philipp-fuernstahl/" target="_blank" style="color: white;">Philipp F&uuml;rnstahl</a><sup>3</sup></span>,
+          <span class="author"><a href="https://www.dqbm.uzh.ch/en/research/menze/pi.html" target="_blank" style="color: white;">Bjoern Menze</a><sup>1</sup></span>,
+          <span class="author"><a href="https://rocs.balgrist.ch/en/dr-lilian-calvet/" target="_blank" style="color: white;">Lilian Calvet</a><sup>3</sup></span>
+        </div>
+
+        <div class="affiliations mb-5 is-size-6 has-text-light">
+          <sup>1</sup>Department of Quantitative Biomedicine, University of Zurich (UZH) &nbsp; &nbsp;
+          <sup>2</sup>IRIT, University of Toulouse, France<br>
+          <sup>3</sup>ROCS, Balgrist University Hospital &nbsp; &nbsp;
+          <sup>4</sup>Independent Researcher<br>
+          <sup>&#42;</sup>Equal contribution (joint first authors)
+        </div>
+
+        <p class="is-size-5 mb-4 has-text-primary" style="font-weight: 600;" id="venue">
+          NeurIPS 2026 — Evaluations &amp; Datasets Track
+        </p>
+
+        <div class="buttons is-centered mb-5">
+          <a class="button is-light is-outlined" href="assets/paper.pdf" target="_blank">
+            <span class="icon"><i class="fas fa-file-pdf"></i></span><span>Paper</span>
+          </a>
+          <a class="button is-light is-outlined" href="#" target="_blank">
+            <span class="icon"><i class="fas fa-file-lines"></i></span><span>arXiv</span>
+          </a>
+          <a class="button is-light is-outlined" href="https://github.com/martine-benchmark/eval-3d" target="_blank">
+            <span class="icon"><i class="fab fa-github"></i></span><span>Code (Eval)</span>
+          </a>
+          <a class="button is-light is-outlined" href="https://github.com/martine-benchmark/contour-registration" target="_blank">
+            <span class="icon"><i class="fab fa-github"></i></span><span>Code (Registration)</span>
+          </a>
+          <a class="button is-light is-outlined" href="https://github.com/martine-benchmark/martine-dataset" target="_blank">
+            <span class="icon"><i class="fas fa-database"></i></span><span>Data</span>
+          </a>
+        </div>
+
+        <div class="content is-medium has-text-white" style="max-width: 900px; margin: auto; text-align: justify;">
+          <p id="abstract">
+            Controlled acquisition setups are widely used for high-accuracy multi-view 3D surface reconstruction, as they allow sensor configuration, image resolution, viewpoint distribution, and illumination to be specified. Yet benchmarking remains difficult, since reconstruction accuracy depends jointly on the reconstruction paradigm, object properties, and acquisition regime. Existing benchmarks often restrict viewpoint coverage, resolution, or illumination, which can bias comparisons toward methods suited to the chosen setting. Others lack accurate 3D ground truth or quantified image-to-geometry alignment, limiting their use for metric surface evaluation. We introduce Martine, a benchmark for controlled 3D object surface reconstruction. Martine comprises 28 objects, including transparent materials and fine structures, captured at 9568&times;6376 pixels from 84 views over a spherical cap under both single-light and multi-light regimes. It provides object-independent camera calibration, accurate 3D ground-truth scans, calibration and image-to-geometry accuracy quantified on test images, and 3D property masks for analysing errors by material properties, visibility, curvature and fine structures. Experiments across photogrammetry, classical multi-view stereo, neural implicit surfaces, Gaussian-splatting-based reconstruction, and multi-view photometric stereo show that Martine enables regime-aware evaluation with explicit control over reference-data accuracy. The benchmark resolves sub-millimetric reconstruction differences, with a best observed mean one-sided Chamfer distance of 0.063&nbsp;mm over the evaluated visible surface.
+          </p>
+          <br>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 2: Videos (Light Theme) -->
+  <section id="videos" class="section theme-light">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Acquisition Setup</h2>
+      <p class="has-text-centered mb-5">
+        Our capture rig combines a Kuka robotic arm, a Sony Alpha 7RV camera, and controlled lighting.
+      </p>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="video-container mb-4">
+            <video muted loop controls playsinline preload="metadata" poster="assets/images/poster_acquisition.jpg">
+              <source src="assets/videos/acquisition.webm" type="video/webm">
+              <source src="assets/videos/acquisition.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="has-text-centered mt-2 mb-5 is-size-6 has-text-grey">Cinematic montage of the acquisition process</p>
+
+          <div class="video-container">
+            <video muted loop controls playsinline preload="metadata" poster="assets/images/poster_blender.jpg">
+              <source src="assets/videos/blender_setup.webm" type="video/webm">
+              <source src="assets/videos/blender_setup.mp4" type="video/mp4">
+            </video>
+          </div>
+          <p class="has-text-centered mt-2 is-size-6 has-text-grey">Blender render illustrating the setup geometry</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Object Gallery (Dark Theme) -->
+  <section id="gallery" class="section theme-dark">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Dataset — 28 Objects</h2><br>
+      <div class="gallery-grid" id="object-gallery">
+        <div class="gallery-item"><img src="assets/images/objects/01_rock.webp" alt="Rock" loading="lazy"><div class="name">Rock</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/02_vase.webp" alt="Vase" loading="lazy"><div class="name">Vase</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/03_hammer_head.webp" alt="Hammer Head" loading="lazy"><div class="name">Hammer Head</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/04_candle.webp" alt="Candle" loading="lazy"><div class="name">Candle</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/05_pillow.webp" alt="Pillow" loading="lazy"><div class="name">Pillow</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/06_can.webp" alt="Can" loading="lazy"><div class="name">Can</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/07_glass.webp" alt="Glass" loading="lazy"><div class="name">Glass</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/08_boule.webp" alt="Petanque Ball" loading="lazy"><div class="name">Petanque Ball</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/09_jam_pot.webp" alt="Jam Pot" loading="lazy"><div class="name">Jam Pot</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/10_colander.webp" alt="Colander" loading="lazy"><div class="name">Colander</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/11_ecorce.webp" alt="Wood" loading="lazy"><div class="name">Wood</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/12_assiette.webp" alt="Plate" loading="lazy"><div class="name">Plate</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/13_paw_pad.webp" alt="Paw Pad" loading="lazy"><div class="name">Paw Pad</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/14_moka.webp" alt="Moka Pot" loading="lazy"><div class="name">Moka Pot</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/15_lego.webp" alt="Lego" loading="lazy"><div class="name">Lego</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/16_surgery_scissors.webp" alt="Surgery Scissors" loading="lazy"><div class="name">Surgery Scissors</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/17_knife.webp" alt="Knife" loading="lazy"><div class="name">Knife</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/18_spikes_ball.webp" alt="Spikes Ball" loading="lazy"><div class="name">Spikes Ball</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/19_straw_bob.webp" alt="Straw Hat" loading="lazy"><div class="name">Straw Hat</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/20_coin.webp" alt="Coin" loading="lazy"><div class="name">Coin</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/21_sneakers.webp" alt="Sneakers" loading="lazy"><div class="name">Sneakers</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/22_surgery_drill.webp" alt="Surgery Saw" loading="lazy"><div class="name">Surgery Saw</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/23_whisk.webp" alt="Whisk" loading="lazy"><div class="name">Whisk</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/24_warrior_head.webp" alt="Warrior Head" loading="lazy"><div class="name">Warrior Head</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/25_plant.webp" alt="Plant" loading="lazy"><div class="name">Plant</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/26_grid.webp" alt="Grid" loading="lazy"><div class="name">Grid</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/27_bowl.webp" alt="Bowl" loading="lazy"><div class="name">Bowl</div></div>
+        <div class="gallery-item"><img src="assets/images/objects/28_spine.webp" alt="Spine" loading="lazy"><div class="name">Spine</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Qualitative Results (Light Theme) -->
+  <section id="results" class="section theme-light">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
+      <p class="has-text-centered mb-5" style="max-width: 900px; margin: auto;">
+        Accuracy heatmaps show the distance from each reconstructed point to the nearest ground-truth point (viridis colormap, 0&ndash;4&nbsp;mm).
+        Drag the slider to compare two methods side by side.
+      </p>
+      <div class="columns is-centered" style="margin-bottom: 0;">
+        <div class="column is-8" style="padding-bottom: 0;">
+          <ul class="object-tabs2" id="dics-object-tabs">
+            <li><a class="active" data-value="15_lego">Lego</a></li>
+            <li><a data-value="03_hammer_head">Hammer Head</a></li>
+            <li><a data-value="07_glass">Glass</a></li>
+            <li><a data-value="22_surgery_drill">Surgery Saw</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="dics-container" id="dics-slider">
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 5: Challenge Taxonomy (Dark Theme) — read-only explainer of the challenge axes -->
+  <section id="taxonomy" class="section theme-dark">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Challenge Taxonomy</h2>
+      <p class="has-text-centered mb-5" style="max-width: 900px; margin: auto;">
+        Every object is annotated with 3D masks marking the surface regions that make reconstruction hard.
+        These challenge categories <em>define the axes</em> used in the benchmark results below.
+        Pick an object to inspect its annotated regions — drag to rotate, scroll to zoom.
+      </p>
+      <div class="challenge-legend" id="challenge-legend">
+        <span class="chip"><span class="swatch" style="background:#8BC34A"></span>Lambertian</span>
+        <span class="chip"><span class="swatch" style="background:#FF9800"></span>Specular</span>
+        <span class="chip"><span class="swatch" style="background:#03A9F4"></span>Transparent</span>
+        <span class="chip"><span class="swatch" style="background:#9C27B0"></span>Textureless</span>
+        <span class="chip"><span class="swatch" style="background:#F44336"></span>Fine Structure</span>
+      </div>
+      <div class="columns is-centered" style="margin-bottom: 0;">
+        <div class="column is-8" style="padding-bottom: 0;">
+          <ul class="object-tabs2" id="taxonomy-object-tabs">
+          </ul>
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="viewer-container" id="viewer-taxonomy">
+            <canvas id="canvas-taxonomy"></canvas>
+            <div class="taxonomy-controls" id="taxonomy-buttons">
+              <!-- category toggles are rebuilt per object by taxonomy-viewer.js -->
+            </div>
+          </div>
+          <p class="has-text-centered mt-3 is-size-7 has-text-grey">
+            Toggle a category to show or hide its highlighted regions.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 6: Benchmark Results by Challenge (Light Theme) — radar, toggle methods -->
+  <section id="radar" class="section theme-light">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Results by Challenge</h2>
+      <p class="has-text-centered mb-5" style="max-width: 900px; margin: auto;">
+        F-score at &tau;&nbsp;=&nbsp;0.5&nbsp;mm across the 7 challenge axes. For each axis, the point-to-surface
+        distances of all objects annotated with that challenge are pooled as a single mesh before scoring
+        (objects that fail to reconstruct are counted as missed). Toggle methods to compare how they
+        behave across challenge types.
+      </p>
+      <div class="columns is-centered is-gapless">
+        <div class="column is-6">
+          <div class="radar-container">
+            <canvas id="radar-chart"></canvas>
+          </div>
+        </div>
+        <div class="column is-4">
+          <div class="radar-controls">
+            <h4 class="title is-5">Methods</h4>
+            <div id="method-checkboxes">
+            </div>
+            <div class="buttons mt-3">
+              <button class="button is-small" id="select-all-methods">Select All</button>
+              <button class="button is-small" id="deselect-all-methods">Deselect All</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 7: BibTeX (Dark Theme) -->
+  <section id="bibtex" class="section theme-dark">
+    <div class="container">
+      <h2 class="title is-3 has-text-centered">Citation</h2>
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="bibtex-block">
+            <button class="button is-small is-pulled-right" id="copy-bibtex" title="Copy to clipboard">
+              <span class="icon"><i class="fas fa-copy"></i></span>
+            </button>
+            <pre id="bibtex-content">@inproceedings{martine2026,
+  title={Martine: Benchmarking Multi-View 3D Surface Reconstruction
+         Across Viewpoint Coverage, Resolution, and Lighting},
+  author={Bruneau, Robin and Brument, Baptiste and Giraud, Frederic and Sigrist, Bastian and Jecklin, Sascha and Fürnstahl, Philipp and Menze, Bjoern and Calvet, Lilian},
+  booktitle={NeurIPS Evaluations \&amp; Datasets (E\&amp;D) Track},
+  year={2026}
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>Martine Benchmark &copy; 2026</p>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script src="js/dics.js"></script>
+  <script type="module" src="js/taxonomy-viewer.js"></script>
+  <script src="js/radar.js"></script>
+  <script>
+    document.getElementById('copy-bibtex').addEventListener('click', function() {
+      const text = document.getElementById('bibtex-content').textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        const icon = this.querySelector('i');
+        icon.className = 'fas fa-check';
+        setTimeout(() => { icon.className = 'fas fa-copy'; }, 2000);
+      });
+    });
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  </script>
+
+</body>
+</html>

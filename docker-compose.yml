@@ -1,0 +1,7 @@
+services:
+  martine-website:
+    build: .
+    container_name: martine-website
+    restart: unless-stopped
+    ports:
+      - "8081:80"

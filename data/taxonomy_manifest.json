@@ -1,0 +1,48 @@
+{
+  "15": {
+    "name": "Lego",
+    "categories": [
+      "specular",
+      "transparent"
+    ],
+    "glb": "taxonomy_15_merged.glb",
+    "labels": "taxonomy_15_labels.json"
+  },
+  "22": {
+    "name": "Surgery Saw",
+    "categories": [
+      "specular",
+      "not_textured",
+      "fine_structure"
+    ],
+    "glb": "taxonomy_22_merged.glb",
+    "labels": "taxonomy_22_labels.json"
+  },
+  "04": {
+    "name": "Candle",
+    "categories": [
+      "not_textured",
+      "fine_structure"
+    ],
+    "glb": "taxonomy_04_merged.glb",
+    "labels": "taxonomy_04_labels.json"
+  },
+  "13": {
+    "name": "Paw Pad",
+    "categories": [
+      "lambertian",
+      "transparent"
+    ],
+    "glb": "taxonomy_13_merged.glb",
+    "labels": "taxonomy_13_labels.json"
+  },
+  "14": {
+    "name": "Moka Pot",
+    "categories": [
+      "specular",
+      "not_textured"
+    ],
+    "glb": "taxonomy_14_merged.glb",
+    "labels": "taxonomy_14_labels.json"
+  }
+}

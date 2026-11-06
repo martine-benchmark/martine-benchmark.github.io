@@ -1,0 +1,10 @@
+slurm_logs/
+scripts/
+cache/
+*.zip
+OpenSubs_*
+__pycache__/
+assets/videos/*.mp4
+assets/images/MINIATURE.jpg.xmp
+.idea/
+JOURNAL.md
