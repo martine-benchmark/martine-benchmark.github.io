@@ -5,6 +5,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Martine: Benchmarking Multi-View 3D Surface Reconstruction</title>
   <link rel="icon" href="assets/images/martine_logo.png" type="image/png">
+
+  <!-- ===== SEO / AEO ===== -->
+  <meta name="description" content="Martine is a high-precision benchmark for controlled multi-view 3D surface reconstruction: 28 objects, 84 views at 9568×6376, single- and multi-light regimes, with sub-millimetric 3D ground truth. NeurIPS 2026.">
+  <meta name="keywords" content="3D reconstruction, multi-view stereo, photometric stereo, benchmark, ground truth, camera calibration, Gaussian splatting, neural implicit surfaces, dataset, NeurIPS 2026">
+  <meta name="author" content="Robin Bruneau, Baptiste Brument, Frederic Giraud, Bastian Sigrist, Sascha Jecklin, Philipp Fürnstahl, Bjoern Menze, Lilian Calvet">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://martine-benchmark.github.io/">
+
+  <!-- Open Graph (previews on Slack, LinkedIn, Bluesky, Facebook…) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Martine Benchmark">
+  <meta property="og:title" content="Martine: Benchmarking Multi-View 3D Surface Reconstruction">
+  <meta property="og:description" content="A high-precision benchmark for controlled multi-view 3D surface reconstruction: 28 objects, 84 views at 9568×6376, single/multi-light, sub-millimetric ground truth. NeurIPS 2026.">
+  <meta property="og:url" content="https://martine-benchmark.github.io/">
+  <meta property="og:image" content="https://martine-benchmark.github.io/assets/images/MINIATURE.jpg">
+  <meta property="og:image:width" content="1739">
+  <meta property="og:image:height" content="1000">
+  <meta property="og:image:alt" content="Martine benchmark objects captured in a controlled multi-view acquisition setup">
+
+  <!-- Twitter / X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Martine: Benchmarking Multi-View 3D Surface Reconstruction">
+  <meta name="twitter:description" content="A high-precision benchmark for controlled multi-view 3D surface reconstruction: 28 objects, 84 views, sub-millimetric ground truth. NeurIPS 2026.">
+  <meta name="twitter:image" content="https://martine-benchmark.github.io/assets/images/MINIATURE.jpg">
+
+  <!-- Google Scholar / Highwire citation tags -->
+  <meta name="citation_title" content="Martine: Benchmarking Multi-View 3D Surface Reconstruction Across Viewpoint Coverage, Resolution, and Lighting">
+  <meta name="citation_author" content="Bruneau, Robin">
+  <meta name="citation_author" content="Brument, Baptiste">
+  <meta name="citation_author" content="Giraud, Frederic">
+  <meta name="citation_author" content="Sigrist, Bastian">
+  <meta name="citation_author" content="Jecklin, Sascha">
+  <meta name="citation_author" content="Fürnstahl, Philipp">
+  <meta name="citation_author" content="Menze, Bjoern">
+  <meta name="citation_author" content="Calvet, Lilian">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="NeurIPS 2026 — Evaluations & Datasets Track">
+  <meta name="citation_pdf_url" content="https://martine-benchmark.github.io/assets/paper.pdf">
+
+  <!-- Full MLCommons Croissant dataset metadata (Hugging Face, Kaggle, Google Dataset Search) -->
+  <link rel="alternate" type="application/ld+json" href="data/croissant.json" title="Croissant metadata">
+
+  <!-- Structured data: Dataset + ScholarlyArticle (Google Dataset Search, AI answer engines) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@graph": [
+      {
+        "@type": "Dataset",
+        "@id": "https://martine-benchmark.github.io/#dataset",
+        "name": "Martine: Benchmarking Multi-View 3D Surface Reconstruction Across Viewpoint Coverage, Resolution, and Lighting",
+        "description": "Martine is a high-precision benchmark for controlled multi-view 3D surface reconstruction. It comprises 28 real-world objects — including transparent, specular, low-texture, and fine-structured items — captured at 9568×6376 resolution from 84 viewpoints over a spherical cap (20°–70° elevation), under both single-light and multi-light (30-LED) regimes. It provides object-independent camera calibration with quantified accuracy, sub-millimetric ground-truth meshes, measured image-to-geometry alignment residuals, and 3D property masks for error analysis by object property.",
+        "url": "https://martine-benchmark.github.io/",
+        "sameAs": "https://doi.org/10.7910/DVN/2BEPEH",
+        "identifier": "https://doi.org/10.7910/DVN/2BEPEH",
+        "license": "https://creativecommons.org/licenses/by/4.0/",
+        "isAccessibleForFree": true,
+        "datePublished": "2026-11-05",
+        "version": "2.0",
+        "keywords": ["3D reconstruction", "multi-view stereo", "photometric stereo", "benchmark", "ground truth", "camera calibration", "Gaussian splatting", "neural implicit surfaces"],
+        "conformsTo": "http://mlcommons.org/croissant/1.0",
+        "creator": [
+          {"@type": "Person", "name": "Robin Bruneau", "sameAs": "https://orcid.org/0000-0003-3178-9019"},
+          {"@type": "Person", "name": "Baptiste Brument", "sameAs": "https://orcid.org/0009-0004-5372-2215"},
+          {"@type": "Person", "name": "Frederic Giraud", "sameAs": "https://orcid.org/0000-0003-1490-7466"},
+          {"@type": "Person", "name": "Bastian Sigrist", "sameAs": "https://orcid.org/0000-0002-7720-1420"},
+          {"@type": "Person", "name": "Sascha Jecklin", "sameAs": "https://orcid.org/0000-0001-6529-487X"},
+          {"@type": "Person", "name": "Philipp Fürnstahl", "sameAs": "https://orcid.org/0000-0001-6484-6206"},
+          {"@type": "Person", "name": "Bjoern Menze", "sameAs": "https://orcid.org/0000-0003-4136-5690"},
+          {"@type": "Person", "name": "Lilian Calvet", "sameAs": "https://orcid.org/0000-0002-2565-2297"}
+        ],
+        "publisher": {"@type": "Organization", "name": "Harvard Dataverse"},
+        "distribution": [
+          {"@type": "DataDownload", "encodingFormat": "application/ld+json", "contentUrl": "https://martine-benchmark.github.io/data/croissant.json", "description": "MLCommons Croissant metadata"},
+          {"@type": "DataDownload", "encodingFormat": "application/zip", "contentUrl": "https://doi.org/10.7910/DVN/2BEPEH", "description": "Full dataset on Harvard Dataverse"}
+        ]
+      },
+      {
+        "@type": "ScholarlyArticle",
+        "@id": "https://martine-benchmark.github.io/#article",
+        "headline": "Martine: Benchmarking Multi-View 3D Surface Reconstruction Across Viewpoint Coverage, Resolution, and Lighting",
+        "url": "https://martine-benchmark.github.io/",
+        "datePublished": "2026",
+        "inLanguage": "en",
+        "author": [
+          {"@type": "Person", "name": "Robin Bruneau", "sameAs": "https://orcid.org/0000-0003-3178-9019"},
+          {"@type": "Person", "name": "Baptiste Brument", "sameAs": "https://orcid.org/0009-0004-5372-2215"},
+          {"@type": "Person", "name": "Frederic Giraud"},
+          {"@type": "Person", "name": "Bastian Sigrist"},
+          {"@type": "Person", "name": "Sascha Jecklin"},
+          {"@type": "Person", "name": "Philipp Fürnstahl"},
+          {"@type": "Person", "name": "Bjoern Menze"},
+          {"@type": "Person", "name": "Lilian Calvet"}
+        ],
+        "publisher": {"@type": "Organization", "name": "NeurIPS — Conference on Neural Information Processing Systems"},
+        "isPartOf": {"@type": "PublicationEvent", "name": "NeurIPS 2026 — Evaluations & Datasets Track"},
+        "about": {"@id": "https://martine-benchmark.github.io/#dataset"}
+      }
+    ]
+  }
+  </script>
+  <!-- ===== /SEO / AEO ===== -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
