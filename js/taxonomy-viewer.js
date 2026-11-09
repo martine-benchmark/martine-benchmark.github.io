@@ -25,12 +25,12 @@ function initViewer() {
   canvas = document.getElementById('canvas-taxonomy');
   if (!canvas) return false;
 
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+  renderer.setClearColor(0x000000, 0); // fond transparent : le dégradé CSS du panneau est commun avec la photo
   // Limite le ratio de pixels pour éviter de ramer sur les écrans 4K/Retina
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xeef0f2);
 
   camera = new THREE.PerspectiveCamera(45, 4 / 3, 0.001, 1000);
   
@@ -155,6 +155,7 @@ async function loadObject(objId) {
   if (!manifest || !manifest[objId]) return;
   const entry = manifest[objId];
 
+  updatePhoto(objId, entry.name);
   disposeCurrentMesh();
 
   try {
@@ -182,6 +183,18 @@ async function loadObject(objId) {
   } catch (err) {
     console.error('[taxonomy] Error loading object:', err);
   }
+}
+
+/**
+ * Photo de référence (vue MVS la plus proche de la vue 3D initiale), générée par scripts/taxonomy_photos.py
+ */
+function updatePhoto(objId, name) {
+  const img = document.getElementById('taxonomy-photo');
+  if (!img) return;
+  img.classList.add('is-loading');
+  img.onload = () => img.classList.remove('is-loading');
+  img.alt = `Photograph of the ${name} under MVS lighting`;
+  img.src = `assets/images/taxonomy/${objId}.webp`;
 }
 
 /**
