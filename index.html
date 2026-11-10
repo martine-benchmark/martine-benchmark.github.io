@@ -262,6 +262,27 @@
     }
     .taxo-pane.viewer-container { aspect-ratio: 1 / 1; height: auto; }
     .taxo-photo { background: #111; }
+    .taxo-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 3px;
+    }
+    .taxo-thumb {
+      position: relative;
+      padding: 0;
+      border: 0;
+      overflow: hidden;
+      background: #1a1a1a;
+      cursor: zoom-in;
+    }
+    .taxo-photo .taxo-thumb img { transition: transform 0.3s ease, filter 0.3s ease, opacity 0.25s ease; }
+    @media (hover: hover) {
+      .taxo-thumb:hover img { transform: scale(1.06); filter: brightness(1.08); }
+    }
+    .taxo-thumb:focus-visible { outline: 2px solid #4a9eed; outline-offset: -2px; z-index: 3; }
     .taxo-photo img {
       position: absolute;
       inset: 0;
@@ -271,6 +292,29 @@
       transition: opacity 0.25s ease;
     }
     .taxo-photo img.is-loading { opacity: 0; }
+    .taxo-full {
+      z-index: 5;
+      opacity: 0;
+      pointer-events: none;
+      cursor: zoom-out;
+    }
+    .taxo-photo.is-expanded .taxo-full { opacity: 1; pointer-events: auto; }
+    .taxo-close {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      z-index: 11;
+      width: 28px;
+      height: 28px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: none;
+    }
+    .taxo-photo.is-expanded .taxo-close { display: block; }
     .taxo-label {
       position: absolute;
       top: 10px;
@@ -499,7 +543,11 @@
         <div class="column is-10">
           <div class="taxo-pair">
             <figure class="taxo-pane taxo-photo">
-              <img id="taxonomy-photo" alt="Photograph of the selected object under MVS lighting" decoding="async">
+              <div class="taxo-grid" id="taxonomy-photos">
+                <!-- 4 views per object, filled by taxonomy-viewer.js -->
+              </div>
+              <img class="taxo-full" id="taxonomy-photo-full" alt="" decoding="async">
+              <button class="taxo-close" id="taxonomy-photo-close" title="Back to the 4 views" aria-label="Back to the 4 views"><i class="fas fa-xmark"></i></button>
               <figcaption class="taxo-label">Photo &middot; MVS lighting</figcaption>
             </figure>
             <div class="taxo-pane viewer-container" id="viewer-taxonomy">
@@ -511,7 +559,7 @@
             </div>
           </div>
           <p class="has-text-centered mt-3 is-size-7 has-text-grey">
-            Compare the photo with the annotated regions &mdash; toggle a category to show or hide it.
+            Four photos from around the object &mdash; hover or click one to enlarge it. Toggle a category to show or hide its regions.
           </p>
         </div>
       </div>
