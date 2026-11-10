@@ -8,6 +8,7 @@ let currentMesh = null;
 let currentLabels = null;
 let manifest = null;
 let isInitialized = false;
+let loadToken = 0; // évite qu'un chargement lent ajoute son maillage après un changement d'onglet
 
 /**
  * Force le rendu d'une image unique (On-demand rendering)
@@ -154,16 +155,21 @@ function updateVertexColors() {
 async function loadObject(objId) {
   if (!manifest || !manifest[objId]) return;
   const entry = manifest[objId];
+  const token = ++loadToken;
 
   updatePhoto(objId, entry.name);
   disposeCurrentMesh();
+  currentMesh = null;
 
   try {
     const labelsResp = await fetch(`assets/meshes/${entry.labels}`).then((r) => r.json());
+    if (token !== loadToken) return;
     currentLabels = labelsResp;
 
     const loader = new GLTFLoader();
     loader.load(`assets/meshes/${entry.glb}`, (gltf) => {
+      if (token !== loadToken) return; // un autre objet a été demandé entre-temps
+      disposeCurrentMesh();
       currentMesh = gltf.scene;
       currentMesh.traverse((child) => {
         if (child.isMesh) {
