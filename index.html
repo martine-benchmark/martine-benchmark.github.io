@@ -241,20 +241,13 @@
       position: relative;
       padding: 0;
       border: 0;
+      overflow: hidden;
       background: #1a1a1a;
       cursor: zoom-in;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
-    .taxo-thumb:nth-child(1) { transform-origin: top left; }
-    .taxo-thumb:nth-child(2) { transform-origin: top right; }
-    .taxo-thumb:nth-child(3) { transform-origin: bottom left; }
-    .taxo-thumb:nth-child(4) { transform-origin: bottom right; }
+    .taxo-photo .taxo-thumb img { transition: transform 0.3s ease, filter 0.3s ease, opacity 0.25s ease; }
     @media (hover: hover) {
-      .taxo-thumb:hover {
-        transform: scale(1.45);
-        z-index: 3;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
-      }
+      .taxo-thumb:hover img { transform: scale(1.06); filter: brightness(1.08); }
     }
     .taxo-thumb:focus-visible { outline: 2px solid #4a9eed; outline-offset: -2px; z-index: 3; }
     .taxo-photo img {
