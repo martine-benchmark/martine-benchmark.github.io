@@ -213,6 +213,39 @@
       border-radius: 3px;
       display: inline-block;
     }
+    /* Gallery: dataset preview dialog */
+    .gallery-item:focus-visible { outline: 2px solid #4a9eed; outline-offset: 4px; border-radius: 8px; }
+    .object-preview {
+      width: min(980px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      padding: 1.25rem 1.5rem 1rem;
+      border: 1px solid #333;
+      border-radius: 12px;
+      background: #161616;
+      color: #ddd;
+    }
+    .object-preview::backdrop { background: rgba(0, 0, 0, 0.7); }
+    .object-preview .op-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem; }
+    .object-preview .op-title { font-size: 1.3rem; font-weight: 700; color: #fff; }
+    .object-preview .op-close {
+      width: 32px; height: 32px; border: 0; border-radius: 50%;
+      background: #2a2a2a; color: #ccc; cursor: pointer;
+    }
+    .object-preview .op-close:hover { background: #3a3a3a; color: #fff; }
+    .object-preview .op-section { margin: 0.75rem 0 0.4rem; font-size: 0.85rem; color: #aaa; }
+    .object-preview .op-section strong { color: #4a9eed; letter-spacing: 0.04em; }
+    .object-preview .op-row { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+    .object-preview .op-row img {
+      width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;
+      border-radius: 6px; background: #222; transition: opacity 0.25s ease;
+    }
+    .object-preview .op-row img.is-loading { opacity: 0; }
+    .object-preview .op-note { margin-top: 0.8rem; font-size: 0.75rem; color: #777; }
+    @media (max-width: 768px) {
+      .object-preview { padding: 1rem; }
+      .object-preview .op-row { grid-template-columns: repeat(4, 1fr); }
+    }
+
     /* Taxonomy: photo | annotated mesh side by side */
     .taxo-pair {
       display: grid;
@@ -371,7 +404,8 @@
   <!-- Section 3: Object Gallery (Dark Theme) -->
   <section id="gallery" class="section theme-dark">
     <div class="container">
-      <h2 class="title is-3 has-text-centered">Dataset — 28 Objects</h2><br>
+      <h2 class="title is-3 has-text-centered">Dataset — 28 Objects</h2>
+      <p class="has-text-centered mb-5 is-size-6 has-text-grey-light">Click an object to preview its MVS and MVPS images.</p>
       <div class="gallery-grid" id="object-gallery">
         <div class="gallery-item"><img src="assets/images/objects/01_rock.webp" alt="Rock" loading="lazy"><div class="name">Rock</div></div>
         <div class="gallery-item"><img src="assets/images/objects/02_vase.webp" alt="Vase" loading="lazy"><div class="name">Vase</div></div>
@@ -402,6 +436,17 @@
         <div class="gallery-item"><img src="assets/images/objects/27_bowl.webp" alt="Bowl" loading="lazy"><div class="name">Bowl</div></div>
         <div class="gallery-item"><img src="assets/images/objects/28_spine.webp" alt="Spine" loading="lazy"><div class="name">Spine</div></div>
       </div>
+      <dialog class="object-preview" id="object-preview" aria-labelledby="op-title">
+        <div class="op-head">
+          <h3 class="op-title" id="op-title"></h3>
+          <button class="op-close" aria-label="Close"><i class="fas fa-xmark"></i></button>
+        </div>
+        <p class="op-section"><strong>MVS</strong> &middot; 8 of the 84 viewpoints around the object</p>
+        <div class="op-row" data-kind="mvs"></div>
+        <p class="op-section"><strong>MVPS</strong> &middot; one viewpoint, 8 of its 30 single-LED lightings (84 viewpoints &times; 30 lights in total)</p>
+        <div class="op-row" data-kind="mvps"></div>
+        <p class="op-note">Downsampled previews with the original background; the released images come at several resolutions (d1 to d8) with the background masked out.</p>
+      </dialog>
     </div>
   </section>
 
@@ -535,6 +580,7 @@
 
   <!-- JS -->
   <script src="js/dics.js"></script>
+  <script src="js/gallery-preview.js"></script>
   <script type="module" src="js/taxonomy-viewer.js"></script>
   <script src="js/radar.js"></script>
   <script>
