@@ -209,6 +209,49 @@
       border-radius: 3px;
       display: inline-block;
     }
+    /* Taxonomy: photo | annotated mesh side by side */
+    .taxo-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .taxo-pane {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      margin: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 50% 42%, #f7f8fa 0%, #e9ecef 62%, #dde1e6 100%);
+    }
+    .taxo-pane.viewer-container { aspect-ratio: 1 / 1; height: auto; }
+    .taxo-photo { background: #111; }
+    .taxo-photo img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.25s ease;
+    }
+    .taxo-photo img.is-loading { opacity: 0; }
+    .taxo-label {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      z-index: 10;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.75);
+      color: #444;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    @media (max-width: 768px) {
+      .taxo-pair { grid-template-columns: 1fr; }
+    }
   </style>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
@@ -398,21 +441,28 @@
         <span class="chip"><span class="swatch" style="background:#F44336"></span>Fine Structure</span>
       </div>
       <div class="columns is-centered" style="margin-bottom: 0;">
-        <div class="column is-8" style="padding-bottom: 0;">
+        <div class="column is-10" style="padding-bottom: 0;">
           <ul class="object-tabs2" id="taxonomy-object-tabs">
           </ul>
         </div>
       </div>
       <div class="columns is-centered">
-        <div class="column is-8">
-          <div class="viewer-container" id="viewer-taxonomy">
-            <canvas id="canvas-taxonomy"></canvas>
-            <div class="taxonomy-controls" id="taxonomy-buttons">
-              <!-- category toggles are rebuilt per object by taxonomy-viewer.js -->
+        <div class="column is-10">
+          <div class="taxo-pair">
+            <figure class="taxo-pane taxo-photo">
+              <img id="taxonomy-photo" alt="Photograph of the selected object under MVS lighting" decoding="async">
+              <figcaption class="taxo-label">Photo &middot; MVS lighting</figcaption>
+            </figure>
+            <div class="taxo-pane viewer-container" id="viewer-taxonomy">
+              <canvas id="canvas-taxonomy"></canvas>
+              <span class="taxo-label">Annotated 3D mesh</span>
+              <div class="taxonomy-controls" id="taxonomy-buttons">
+                <!-- category toggles are rebuilt per object by taxonomy-viewer.js -->
+              </div>
             </div>
           </div>
           <p class="has-text-centered mt-3 is-size-7 has-text-grey">
-            Toggle a category to show or hide its highlighted regions.
+            Compare the photo with the annotated regions &mdash; toggle a category to show or hide it.
           </p>
         </div>
       </div>
