@@ -192,15 +192,49 @@ async function loadObject(objId) {
 }
 
 /**
- * Photo de référence (vue MVS la plus proche de la vue 3D initiale), générée par scripts/taxonomy_photos.py
+ * Photos de référence : 4 vues MVS autour de l'objet (la 1re = vue 3D initiale),
+ * générées par scripts/taxonomy_photos.py. Clic = plein panneau, re-clic ou ✕ = retour à la grille.
  */
+const N_PHOTOS = 4;
+let photoPane = null;
+
+function collapsePhoto() {
+  if (photoPane) photoPane.classList.remove('is-expanded');
+}
+
+function initPhotoPane() {
+  const grid = document.getElementById('taxonomy-photos');
+  if (!grid || photoPane) return;
+  photoPane = grid.closest('.taxo-photo');
+  const full = document.getElementById('taxonomy-photo-full');
+  full.addEventListener('click', collapsePhoto);
+  document.getElementById('taxonomy-photo-close').addEventListener('click', collapsePhoto);
+  for (let k = 0; k < N_PHOTOS; k++) {
+    const btn = document.createElement('button');
+    btn.className = 'taxo-thumb';
+    const img = document.createElement('img');
+    img.decoding = 'async';
+    btn.appendChild(img);
+    btn.addEventListener('click', () => {
+      full.src = img.src;
+      full.alt = img.alt;
+      photoPane.classList.add('is-expanded');
+    });
+    grid.appendChild(btn);
+  }
+}
+
 function updatePhoto(objId, name) {
-  const img = document.getElementById('taxonomy-photo');
-  if (!img) return;
-  img.classList.add('is-loading');
-  img.onload = () => img.classList.remove('is-loading');
-  img.alt = `Photograph of the ${name} under MVS lighting`;
-  img.src = `assets/images/taxonomy/${objId}.webp`;
+  initPhotoPane();
+  if (!photoPane) return;
+  collapsePhoto();
+  photoPane.querySelectorAll('.taxo-thumb img').forEach((img, k) => {
+    img.classList.add('is-loading');
+    img.onload = () => img.classList.remove('is-loading');
+    img.alt = `Photograph of the ${name} under MVS lighting, view ${k + 1} of ${N_PHOTOS}`;
+    img.parentElement.setAttribute('aria-label', `Enlarge view ${k + 1}`);
+    img.src = `assets/images/taxonomy/${objId}_${k}.webp`;
+  });
 }
 
 /**
